@@ -13,14 +13,13 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const imageUrl = req.body.imageUrl;
   const description = req.body.description;
-  req.user.createProduct({  //special sequelize fxn addedto the User since we used belongsTo function to Product
-    title: title,
-    price: price,
-    imageUrl: imageUrl,
-    description: description //Automatically creates a connected model,,,easy way to use associations in sequelize  ,ensure our models know bput eachother
-  })
+  
+  const product = new Product(title, price, imageUrl, description);
+
+  product
+    .save()
     .then(result => {
-      console.log(result);
+      //console.log(result);
       res.redirect('/admin/products')
     })
     .catch(err => {

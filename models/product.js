@@ -1,32 +1,41 @@
-const Sequelize = require('sequelize'); //gives back a constructor function
-const sequelize =  require('../util/database'); //import db magt pool by sequelize
+const getDb = require('../util/database').getDb;
 
-//we can now design a Model managed by sequelize
-const Product = sequelize.define('product',{
-  id:{
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true
-  },
-  title:{
-    type:Sequelize.STRING,
-    allowNull:false
-  },
-  price:{
-    type:Sequelize.DOUBLE,
-    allowNull:false
-  },
-  imageUrl:{
-    type:Sequelize.STRING,
-    allowNull: false
-  },
-  description:{
-    type:Sequelize.STRING,
-    allowNull: false
+class Product {
+  constructor(title, price, imageUrl, description) {
+    this.title = title;
+    this.price = price;
+    this.imageUrl = imageUrl;
+    this.description = description;
   }
-})
+  //create a new product in js,a new obj which follows the above form
+  //save() method used to save it to the db
+  save() {
+    const db = getDb();
+    return db.collection('products')
+      .insertOne(this)
+      .then(result => {
+        console.log(result);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
 
-//Export your model usable in any other module
+  static fetchAll() { //interact wiht our mongodb to fetch All products
+    const db = getDb();
+    return db
+      .collection('products')
+      .find()
+      .toArray()//get all docs and turn them into an array i.e for few docs prefarably OR Pagination
+      .then(products => {
+        console.log(products);
+        return products;
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+  
+}
 
 module.exports = Product;

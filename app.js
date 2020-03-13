@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
+const mongoConnect = require('./util/database').mongoConnect; //will be a function since we are exporting the func with a cb in it
 
 const app = express();
 
@@ -21,10 +22,17 @@ app.use((req, res, next) => { //only runs after app initialized
     //         next();
     //     })
     //     .catch(err => { console.log(err) });
+    next();
 })
 
-app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-
 app.use(errorController.get404);
+
+mongoConnect(() => {
+    app.listen(3000, () => {
+        console.log('==============================')
+        console.log('Server listening on port 3000')
+        console.log('==============================')
+    })
+})
 
